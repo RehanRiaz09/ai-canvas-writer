@@ -4,16 +4,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Copy, Download, RefreshCw, Wand2, Image } from "lucide-react";
+import { Sparkles, Copy, Download, RefreshCw, Wand2, Image, Globe, ExternalLink, Crown } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Generator() {
   const [prompt, setPrompt] = useState("");
   const [contentType, setContentType] = useState("");
   const [tone, setTone] = useState("");
+  const [language, setLanguage] = useState("english");
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState("");
+  const [userTier, setUserTier] = useState("free"); // free, professional, enterprise
 
   const contentTypes = [
     { value: "blog-post", label: "Blog Post" },
@@ -32,6 +34,26 @@ export default function Generator() {
     { value: "conversational", label: "Conversational" },
     { value: "persuasive", label: "Persuasive" },
   ];
+
+  const languages = [
+    { value: "english", label: "English" },
+    { value: "spanish", label: "Spanish" },
+    { value: "french", label: "French" },
+    { value: "german", label: "German" },
+    { value: "italian", label: "Italian" },
+    { value: "portuguese", label: "Portuguese" },
+    { value: "chinese", label: "Chinese" },
+    { value: "japanese", label: "Japanese" },
+  ];
+
+  const competitorSamples = [
+    { name: "Copy.ai", url: "https://copy.ai", description: "AI copywriting platform" },
+    { name: "Jasper", url: "https://jasper.ai", description: "AI content generation tool" },
+    { name: "Writesonic", url: "https://writesonic.com", description: "AI writing assistant" },
+    { name: "ContentBot", url: "https://contentbot.ai", description: "AI content creator" },
+  ];
+
+  const canGenerateImages = userTier === "professional" || userTier === "enterprise";
 
   const handleGenerate = async () => {
     if (!prompt || !contentType || !tone) {
@@ -71,9 +93,17 @@ ${prompt} represents a significant opportunity for growth and innovation. By mai
 *Generated with AIContentPro - your AI-powered content creation platform*`;
 
       setGeneratedContent(sampleContent);
-      setGeneratedImage("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop");
+      
+      // Only generate images for Professional and Enterprise users
+      if (canGenerateImages) {
+        setGeneratedImage("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop");
+        toast.success("Content and image generated successfully!");
+      } else {
+        setGeneratedImage("");
+        toast.success("Content generated successfully! Upgrade to Professional or Enterprise for AI images.");
+      }
+      
       setIsGenerating(false);
-      toast.success("Content generated successfully!");
     }, 2000);
   };
 
@@ -139,6 +169,7 @@ ${prompt} represents a significant opportunity for growth and innovation. By mai
                   </SelectContent>
                 </Select>
               </div>
+...
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -154,6 +185,51 @@ ${prompt} represents a significant opportunity for growth and innovation. By mai
                         {t.label}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <Globe className="inline h-4 w-4 mr-1" />
+                  Language
+                </label>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="bg-muted/50 border-border">
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languages.map((lang) => (
+                      <SelectItem key={lang.value} value={lang.value}>
+                        {lang.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  User Tier (Demo)
+                </label>
+                <Select value={userTier} onValueChange={setUserTier}>
+                  <SelectTrigger className="bg-muted/50 border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="free">Free</SelectItem>
+                    <SelectItem value="professional">
+                      <div className="flex items-center">
+                        <Crown className="h-4 w-4 mr-2 text-yellow-500" />
+                        Professional
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="enterprise">
+                      <div className="flex items-center">
+                        <Crown className="h-4 w-4 mr-2 text-purple-500" />
+                        Enterprise
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -257,6 +333,38 @@ ${prompt} represents a significant opportunity for growth and innovation. By mai
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Competitor Samples Section */}
+        <div className="mt-16 max-w-7xl mx-auto">
+          <Card className="bg-gradient-card border-border shadow-glow">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <ExternalLink className="h-5 w-5 text-ai-primary" />
+                <span>Competitor Tools & Inspiration</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {competitorSamples.map((competitor) => (
+                  <div key={competitor.name} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:border-ai-primary/50 transition-colors">
+                    <div>
+                      <h4 className="font-medium">{competitor.name}</h4>
+                      <p className="text-sm text-muted-foreground">{competitor.description}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(competitor.url, '_blank')}
+                      className="border-border hover:bg-muted"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
