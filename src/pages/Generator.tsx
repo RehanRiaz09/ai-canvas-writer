@@ -1,0 +1,266 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Copy, Download, RefreshCw, Wand2, Image } from "lucide-react";
+import { toast } from "sonner";
+
+export default function Generator() {
+  const [prompt, setPrompt] = useState("");
+  const [contentType, setContentType] = useState("");
+  const [tone, setTone] = useState("");
+  const [generatedContent, setGeneratedContent] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState("");
+
+  const contentTypes = [
+    { value: "blog-post", label: "Blog Post" },
+    { value: "social-media", label: "Social Media Post" },
+    { value: "product-description", label: "Product Description" },
+    { value: "email-campaign", label: "Email Campaign" },
+    { value: "ad-copy", label: "Ad Copy" },
+    { value: "press-release", label: "Press Release" },
+  ];
+
+  const tones = [
+    { value: "professional", label: "Professional" },
+    { value: "casual", label: "Casual" },
+    { value: "friendly", label: "Friendly" },
+    { value: "authoritative", label: "Authoritative" },
+    { value: "conversational", label: "Conversational" },
+    { value: "persuasive", label: "Persuasive" },
+  ];
+
+  const handleGenerate = async () => {
+    if (!prompt || !contentType || !tone) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsGenerating(true);
+    
+    // Simulate AI content generation
+    setTimeout(() => {
+      const sampleContent = `# ${contentType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+
+${prompt.charAt(0).toUpperCase() + prompt.slice(1)} is an exciting topic that deserves attention. Here's a comprehensive piece crafted in a ${tone} tone:
+
+## Introduction
+In today's fast-paced digital landscape, understanding ${prompt} has become more crucial than ever. This ${contentType.replace('-', ' ')} explores the key aspects and provides valuable insights.
+
+## Key Points
+- **Innovation**: The latest trends and developments
+- **Strategy**: Practical approaches for implementation  
+- **Results**: Measurable outcomes and benefits
+- **Future**: What lies ahead in this space
+
+## Main Content
+The world of ${prompt} continues to evolve rapidly. By adopting a ${tone} approach, we can better understand the nuances and implications. Whether you're a beginner or an expert, these insights will help you navigate this complex landscape.
+
+Consider the following strategies:
+1. Research thoroughly before implementation
+2. Test different approaches systematically
+3. Measure results and iterate accordingly
+4. Stay updated with industry trends
+
+## Conclusion
+${prompt} represents a significant opportunity for growth and innovation. By maintaining a ${tone} perspective and focusing on practical implementation, success becomes achievable.
+
+*Generated with AIContentPro - your AI-powered content creation platform*`;
+
+      setGeneratedContent(sampleContent);
+      setGeneratedImage("https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop");
+      setIsGenerating(false);
+      toast.success("Content generated successfully!");
+    }, 2000);
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedContent);
+    toast.success("Content copied to clipboard!");
+  };
+
+  const downloadContent = () => {
+    const blob = new Blob([generatedContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ai-generated-${contentType}-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Content downloaded!");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-hero pt-20 pb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center space-x-2 bg-muted/50 rounded-full px-4 py-2 mb-4">
+            <Wand2 className="h-4 w-4 text-ai-primary" />
+            <span className="text-sm font-medium">AI Content Generator</span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+            Create Amazing Content with{" "}
+            <span className="bg-gradient-primary bg-clip-text text-transparent">
+              AI Magic
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Transform your ideas into compelling content in seconds
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          {/* Input Section */}
+          <Card className="bg-gradient-card border-border shadow-glow">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Sparkles className="h-5 w-5 text-ai-primary" />
+                <span>Content Settings</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Content Type
+                </label>
+                <Select value={contentType} onValueChange={setContentType}>
+                  <SelectTrigger className="bg-muted/50 border-border">
+                    <SelectValue placeholder="Choose content type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {contentTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Tone & Style
+                </label>
+                <Select value={tone} onValueChange={setTone}>
+                  <SelectTrigger className="bg-muted/50 border-border">
+                    <SelectValue placeholder="Select tone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tones.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Topic / Description
+                </label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Describe what you want to write about..."
+                  rows={6}
+                  className="bg-muted/50 border-border resize-none"
+                />
+              </div>
+
+              <Button 
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+              >
+                {isGenerating ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Generate Content
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Output Section */}
+          <Card className="bg-gradient-card border-border shadow-glow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center space-x-2">
+                  <Sparkles className="h-5 w-5 text-ai-primary" />
+                  <span>Generated Content</span>
+                </CardTitle>
+                {generatedContent && (
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={copyToClipboard}
+                      className="border-border hover:bg-muted"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={downloadContent}
+                      className="border-border hover:bg-muted"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {!generatedContent ? (
+                <div className="flex flex-col items-center justify-center h-96 text-center">
+                  <div className="relative mb-4">
+                    <div className="absolute inset-0 bg-ai-primary/20 rounded-full blur-md"></div>
+                    <div className="relative bg-muted/50 rounded-full p-8">
+                      <Wand2 className="h-12 w-12 text-ai-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Ready to Create</h3>
+                  <p className="text-muted-foreground">
+                    Fill in the settings and click generate to create amazing content
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {generatedImage && (
+                    <div className="relative">
+                      <img
+                        src={generatedImage}
+                        alt="Generated content image"
+                        className="w-full h-48 object-cover rounded-lg border border-border"
+                      />
+                      <Badge className="absolute top-2 right-2 bg-ai-primary/20 text-ai-primary border-ai-primary/30">
+                        <Image className="h-3 w-3 mr-1" />
+                        AI Generated
+                      </Badge>
+                    </div>
+                  )}
+                  <div className="bg-muted/30 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    <pre className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {generatedContent}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
