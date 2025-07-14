@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Copy, Download, RefreshCw, Wand2, Image, Globe, ExternalLink, Crown } from "lucide-react";
+import { Sparkles, Copy, Download, RefreshCw, Wand2, Image, Globe, ExternalLink, Crown, Link, Tag, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Generator() {
@@ -16,6 +17,10 @@ export default function Generator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState("");
   const [userTier, setUserTier] = useState("free"); // free, professional, enterprise
+  const [referenceLinks, setReferenceLinks] = useState<string[]>([]);
+  const [newReferenceLink, setNewReferenceLink] = useState("");
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [newKeyword, setNewKeyword] = useState("");
 
   const contentTypes = [
     { value: "blog-post", label: "Blog Post" },
@@ -55,6 +60,28 @@ export default function Generator() {
 
   const canGenerateImages = userTier === "professional" || userTier === "enterprise";
 
+  const addReferenceLink = () => {
+    if (newReferenceLink.trim() && !referenceLinks.includes(newReferenceLink.trim())) {
+      setReferenceLinks([...referenceLinks, newReferenceLink.trim()]);
+      setNewReferenceLink("");
+    }
+  };
+
+  const removeReferenceLink = (index: number) => {
+    setReferenceLinks(referenceLinks.filter((_, i) => i !== index));
+  };
+
+  const addKeyword = () => {
+    if (newKeyword.trim() && !keywords.includes(newKeyword.trim())) {
+      setKeywords([...keywords, newKeyword.trim()]);
+      setNewKeyword("");
+    }
+  };
+
+  const removeKeyword = (index: number) => {
+    setKeywords(keywords.filter((_, i) => i !== index));
+  };
+
   const handleGenerate = async () => {
     if (!prompt || !contentType || !tone) {
       toast.error("Please fill in all fields");
@@ -63,34 +90,43 @@ export default function Generator() {
 
     setIsGenerating(true);
     
-    // Simulate AI content generation
+    // Simulate AI content generation with reference links and keywords
     setTimeout(() => {
+      const keywordText = keywords.length > 0 ? `\n\n**Target Keywords**: ${keywords.join(', ')}` : '';
+      const referencesText = referenceLinks.length > 0 ? 
+        `\n\n## References\n${referenceLinks.map((link, i) => `${i + 1}. ${link}`).join('\n')}` : '';
+      
       const sampleContent = `# ${contentType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
 
-${prompt.charAt(0).toUpperCase() + prompt.slice(1)} is an exciting topic that deserves attention. Here's a comprehensive piece crafted in a ${tone} tone:
+${prompt.charAt(0).toUpperCase() + prompt.slice(1)} is an exciting topic that deserves attention. Here's a comprehensive piece crafted in a ${tone} tone, optimized with your provided keywords and informed by reference materials.${keywordText}
 
 ## Introduction
-In today's fast-paced digital landscape, understanding ${prompt} has become more crucial than ever. This ${contentType.replace('-', ' ')} explores the key aspects and provides valuable insights.
+In today's fast-paced digital landscape, understanding ${prompt} has become more crucial than ever. This ${contentType.replace('-', ' ')} explores the key aspects and provides valuable insights${keywords.length > 0 ? `, focusing on key terms like ${keywords.slice(0, 3).join(', ')}` : ''}.
 
 ## Key Points
-- **Innovation**: The latest trends and developments
-- **Strategy**: Practical approaches for implementation  
+- **Innovation**: The latest trends and developments${keywords.includes('innovation') ? ' (keyword targeted)' : ''}
+- **Strategy**: Practical approaches for implementation${keywords.includes('strategy') ? ' (keyword targeted)' : ''}
 - **Results**: Measurable outcomes and benefits
 - **Future**: What lies ahead in this space
 
 ## Main Content
 The world of ${prompt} continues to evolve rapidly. By adopting a ${tone} approach, we can better understand the nuances and implications. Whether you're a beginner or an expert, these insights will help you navigate this complex landscape.
 
+${keywords.length > 0 ? `This content strategically incorporates your target keywords: ${keywords.join(', ')}, ensuring better SEO performance and relevance.` : ''}
+
 Consider the following strategies:
 1. Research thoroughly before implementation
 2. Test different approaches systematically
 3. Measure results and iterate accordingly
 4. Stay updated with industry trends
+${referenceLinks.length > 0 ? '5. Leverage insights from trusted reference sources' : ''}
 
 ## Conclusion
 ${prompt} represents a significant opportunity for growth and innovation. By maintaining a ${tone} perspective and focusing on practical implementation, success becomes achievable.
 
-*Generated with AIContentPro - your AI-powered content creation platform*`;
+${referenceLinks.length > 0 ? 'This content has been enriched with insights from your provided reference materials, ensuring accuracy and credibility.' : ''}
+
+*Generated with AIContentPro - your AI-powered content creation platform*${referencesText}`;
 
       setGeneratedContent(sampleContent);
       
@@ -232,6 +268,96 @@ ${prompt} represents a significant opportunity for growth and innovation. By mai
                     </SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <Link className="inline h-4 w-4 mr-1" />
+                  Reference Links
+                </label>
+                <div className="space-y-2">
+                  <div className="flex space-x-2">
+                    <Input
+                      value={newReferenceLink}
+                      onChange={(e) => setNewReferenceLink(e.target.value)}
+                      placeholder="Add reference URL..."
+                      className="bg-muted/50 border-border"
+                      onKeyPress={(e) => e.key === 'Enter' && addReferenceLink()}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addReferenceLink}
+                      className="border-border hover:bg-muted px-3"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {referenceLinks.length > 0 && (
+                    <div className="space-y-1">
+                      {referenceLinks.map((link, index) => (
+                        <div key={index} className="flex items-center justify-between bg-muted/30 rounded p-2">
+                          <span className="text-sm truncate flex-1 mr-2">{link}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeReferenceLink(index)}
+                            className="h-6 w-6 p-0 hover:bg-destructive/20"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <Tag className="inline h-4 w-4 mr-1" />
+                  Keywords
+                </label>
+                <div className="space-y-2">
+                  <div className="flex space-x-2">
+                    <Input
+                      value={newKeyword}
+                      onChange={(e) => setNewKeyword(e.target.value)}
+                      placeholder="Add keyword..."
+                      className="bg-muted/50 border-border"
+                      onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addKeyword}
+                      className="border-border hover:bg-muted px-3"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {keywords.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {keywords.map((keyword, index) => (
+                        <Badge key={index} variant="secondary" className="bg-ai-primary/20 text-ai-primary border-ai-primary/30">
+                          {keyword}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeKeyword(index)}
+                            className="h-4 w-4 p-0 ml-1 hover:bg-destructive/20"
+                          >
+                            <X className="h-2 w-2" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
