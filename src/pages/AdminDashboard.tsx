@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";  
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { UserDropdown } from "@/components/UserDropdown";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,7 +17,8 @@ import {
   Activity,
   AlertCircle,
   CheckCircle,
-  Clock
+  Clock,
+  Shield
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -78,8 +81,19 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero pt-20 pb-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-subtle">
+      {/* Admin Header */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-ai-primary" />
+            <span className="text-xl font-bold">Admin Dashboard</span>
+          </div>
+          <UserDropdown />
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -322,19 +336,19 @@ export default function AdminDashboard() {
                           <Badge className={component.status === "healthy" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
                             {component.status}
                           </Badge>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            Uptime: {component.uptime}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
+                           <div className="text-sm text-muted-foreground mt-1">
+                             Uptime: {component.uptime}
+                           </div>
+                         </div>
+                       </div>
+                     );
+                   })}
+                 </div>
+               </CardContent>
+             </Card>
+           </TabsContent>
+         </Tabs>
+       </div>
+     </div>
+   );
 }
