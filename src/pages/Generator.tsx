@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { UserDropdown } from "@/components/UserDropdown";
 import { Sparkles, Copy, Download, RefreshCw, Wand2, Image, Globe, ExternalLink, Crown, Link, Tag, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -160,7 +161,19 @@ ${referenceLinks.length > 0 ? 'This content has been enriched with insights from
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero pt-20 pb-12">
+    <div className="min-h-screen bg-gradient-hero">
+      {/* Header with User Dropdown */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-6 w-6 text-ai-primary" />
+            <span className="text-xl font-bold">AIContentPro</span>
+          </div>
+          <UserDropdown />
+        </div>
+      </header>
+      
+      <div className="pt-12 pb-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <div className="inline-flex items-center space-x-2 bg-muted/50 rounded-full px-4 py-2 mb-4">
@@ -494,6 +507,7 @@ ${referenceLinks.length > 0 ? 'This content has been enriched with insights from
             </CardContent>
           </Card>
         </div>
+      </div>
       </div>
     </div>
   );
