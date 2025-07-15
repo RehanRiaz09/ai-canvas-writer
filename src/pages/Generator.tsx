@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { UserDropdown } from "@/components/UserDropdown";
-import { Sparkles, Copy, Download, RefreshCw, Wand2, Image, Globe, ExternalLink, Crown, Link, Tag, Plus, X } from "lucide-react";
+import { Sparkles, Copy, Download, RefreshCw, Wand2, Image, Globe, ExternalLink, Crown, Link, Tag, Plus, X, FileText } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 
 export default function Generator() {
@@ -22,6 +23,7 @@ export default function Generator() {
   const [newReferenceLink, setNewReferenceLink] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState("");
+  const [wordCount, setWordCount] = useState([500]); // Using array for Slider component
 
   const contentTypes = [
     { value: "blog-post", label: "Blog Post" },
@@ -91,15 +93,30 @@ export default function Generator() {
 
     setIsGenerating(true);
     
-    // Simulate AI content generation with reference links and keywords
+    // Simulate AI content generation with reference links, keywords, and word count
     setTimeout(() => {
+      const targetWords = wordCount[0];
       const keywordText = keywords.length > 0 ? `\n\n**Target Keywords**: ${keywords.join(', ')}` : '';
       const referencesText = referenceLinks.length > 0 ? 
         `\n\n## References\n${referenceLinks.map((link, i) => `${i + 1}. ${link}`).join('\n')}` : '';
       
-      const sampleContent = `# ${contentType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+      // Generate content based on target word count
+      let mainContent = '';
+      const baseContent = `${prompt.charAt(0).toUpperCase() + prompt.slice(1)} is an exciting topic that deserves attention. Here's a comprehensive piece crafted in a ${tone} tone, optimized with your provided keywords and informed by reference materials.`;
+      
+      if (targetWords <= 100) {
+        // Short content
+        mainContent = `${baseContent} This concise overview highlights the essential aspects of ${prompt}, providing valuable insights for quick understanding and immediate implementation.`;
+      } else if (targetWords <= 300) {
+        // Medium content
+        mainContent = `${baseContent}
 
-${prompt.charAt(0).toUpperCase() + prompt.slice(1)} is an exciting topic that deserves attention. Here's a comprehensive piece crafted in a ${tone} tone, optimized with your provided keywords and informed by reference materials.${keywordText}
+In today's fast-paced digital landscape, understanding ${prompt} has become more crucial than ever. This ${contentType.replace('-', ' ')} explores the key aspects and provides valuable insights${keywords.length > 0 ? `, focusing on key terms like ${keywords.slice(0, 3).join(', ')}` : ''}.
+
+Key considerations include innovation, strategy, and measurable results. Whether you're a beginner or an expert, these insights will help you navigate this complex landscape effectively.`;
+      } else {
+        // Long content
+        mainContent = `${baseContent}
 
 ## Introduction
 In today's fast-paced digital landscape, understanding ${prompt} has become more crucial than ever. This ${contentType.replace('-', ' ')} explores the key aspects and provides valuable insights${keywords.length > 0 ? `, focusing on key terms like ${keywords.slice(0, 3).join(', ')}` : ''}.
@@ -122,12 +139,35 @@ Consider the following strategies:
 4. Stay updated with industry trends
 ${referenceLinks.length > 0 ? '5. Leverage insights from trusted reference sources' : ''}
 
+## Detailed Analysis
+${targetWords > 500 ? `When examining ${prompt} in greater detail, several critical factors emerge. The landscape is characterized by rapid technological advancement, evolving user expectations, and increasing competitive pressures. Organizations that succeed in this environment typically demonstrate agility, innovation, and a deep understanding of market dynamics.
+
+Furthermore, the implementation of effective strategies requires careful planning, resource allocation, and continuous monitoring. Success metrics should be clearly defined and regularly evaluated to ensure optimal outcomes and return on investment.` : ''}
+
+${targetWords > 800 ? `## Advanced Considerations
+For organizations looking to maximize their impact in the ${prompt} space, advanced considerations become paramount. These include scalability planning, risk assessment, compliance requirements, and integration with existing systems and processes.
+
+Additionally, staying ahead of emerging trends requires ongoing investment in research and development, strategic partnerships, and continuous learning initiatives. The most successful organizations maintain a balance between innovation and stability, ensuring sustainable growth while remaining adaptable to market changes.
+
+## Best Practices
+Based on industry analysis and expert insights, several best practices have emerged:
+- Establish clear objectives and success metrics
+- Invest in team training and skill development
+- Implement robust monitoring and evaluation systems
+- Foster a culture of continuous improvement
+- Maintain strong stakeholder communication` : ''}
+
 ## Conclusion
-${prompt} represents a significant opportunity for growth and innovation. By maintaining a ${tone} perspective and focusing on practical implementation, success becomes achievable.
+${prompt} represents a significant opportunity for growth and innovation. By maintaining a ${tone} perspective and focusing on practical implementation, success becomes achievable.`;
+      }
+
+      const sampleContent = `# ${contentType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+
+${mainContent}${keywordText}
 
 ${referenceLinks.length > 0 ? 'This content has been enriched with insights from your provided reference materials, ensuring accuracy and credibility.' : ''}
 
-*Generated with AIContentPro - your AI-powered content creation platform*${referencesText}`;
+*Generated with AIContentPro - targeting ~${targetWords} words*${referencesText}`;
 
       setGeneratedContent(sampleContent);
       
@@ -370,6 +410,27 @@ ${referenceLinks.length > 0 ? 'This content has been enriched with insights from
                       ))}
                     </div>
                   )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <FileText className="inline h-4 w-4 mr-1" />
+                  Word Count: {wordCount[0]} words
+                </label>
+                <div className="px-3 py-2">
+                  <Slider
+                    value={wordCount}
+                    onValueChange={setWordCount}
+                    max={2000}
+                    min={50}
+                    step={50}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>50 words</span>
+                    <span>2000 words</span>
+                  </div>
                 </div>
               </div>
 
